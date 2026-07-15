@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pure Pro CRM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#EEF3F4;
+    --surface:#FFFFFF;
+    --surface-2:#F4F8F9;
+    --ink:#122B2E;
+    --ink-soft:#4A6367;
+    --muted:#8CA0A3;
+    --border:#DCE6E8;
+    --blue:#1B6E8C;
+    --blue-bg:#DFEEF3;
+    --blue-text:#0F4457;
+    --amber:#C97A2B;
+    --amber-bg:#FAEADA;
+    --amber-text:#7A4315;
+    --teal:#177A63;
+    --teal-bg:#DDF0E9;
+    --teal-text:#0E4B3C;
+    --slate-bg:#E4E9EA;
+    --slate-text:#43585B;
+    --red:#B23A2E;
+    --red-bg:#FBE7E4;
+    --red-text:#7A281F;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 80px;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;flex-wrap:wrap;gap:14px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .mark{
+    width:38px;height:38px;border-radius:9px;background:var(--blue);
+    color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .brand .mark svg{width:20px;height:20px;}
+  h1{font-family:'Source Serif 4',serif;font-weight:600;font-size:24px;margin:0;letter-spacing:-0.01em;}
+  .tagline{font-size:12.5px;color:var(--muted);margin-top:1px;}
+
+  .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+  .tab{padding:9px 16px;font-size:14px;font-weight:500;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;}
+  .stat .num{font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;}
+  .stat .label{font-size:11.5px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.03em;}
+
+  .toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=date], select, textarea{
+    font-family:inherit;font-size:14px;border:1px solid var(--border);border-radius:8px;
+    padding:9px 12px;background:var(--surface);color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;}
+  #search{flex:1;min-width:180px;}
+  .btn{font-family:inherit;font-size:14px;font-weight:500;border-radius:8px;padding:9px 16px;border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer;}
+  .btn:hover{background:#155a74;}
+  .btn.secondary{background:var(--surface);color:var(--ink);border-color:var(--border);}
+  .btn.secondary:hover{background:var(--surface-2);}
+  .btn.danger{background:var(--surface);color:var(--red);border-color:var(--red-bg);}
+  .btn.danger:hover{background:var(--red-bg);}
+  .btn.small{padding:6px 12px;font-size:13px;}
+
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{font-size:12.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--ink-soft);}
+  .chip.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+  .list{display:flex;flex-direction:column;gap:8px;}
+  .row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .row:hover{border-color:#b9cbce;}
+  .row-main{flex:1;min-width:0;}
+  .row-name{font-weight:600;font-size:14.5px;}
+  .row-sub{font-size:12.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;flex-shrink:0;text-transform:uppercase;letter-spacing:.03em;}
+  .pill.lead{background:var(--slate-bg);color:var(--slate-text);}
+  .pill.quote_sent{background:var(--amber-bg);color:var(--amber-text);}
+  .pill.scheduled_install{background:var(--blue-bg);color:var(--blue-text);}
+  .pill.active_customer{background:var(--teal-bg);color:var(--teal-text);}
+  .pill.needs_service{background:var(--red-bg);color:var(--red-text);}
+  .row-date{font-size:12px;color:var(--muted);width:150px;text-align:right;flex-shrink:0;}
+  .row-date .due{color:var(--red-text);font-weight:500;}
+
+  .pagination{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:18px;font-size:13.5px;color:var(--ink-soft);}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty .mark{font-family:'Source Serif 4',serif;font-size:19px;color:var(--ink-soft);margin-bottom:6px;}
+
+  .overlay{display:none;position:fixed;inset:0;background:rgba(18,43,46,0.4);align-items:flex-start;justify-content:center;padding:40px 16px;z-index:10;overflow-y:auto;}
+  .overlay.open{display:flex;}
+  .panel{background:var(--surface);border-radius:14px;padding:24px;width:100%;max-width:520px;border:1px solid var(--border);}
+  .panel h2{font-family:'Source Serif 4',serif;font-size:19px;margin:0 0 4px;}
+  .panel .inv-num{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+  .field{margin-bottom:12px;display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+  .field input, .field select, .field textarea{width:100%;}
+  .field textarea{resize:vertical;min-height:60px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:3px;}
+  .panel-actions{display:flex;justify-content:space-between;margin-top:18px;gap:8px;}
+  .panel-actions .right{display:flex;gap:8px;}
+
+  .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+  .card h3{font-family:'Source Serif 4',serif;font-size:16px;margin:0 0 14px;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+  .bar-label{width:130px;color:var(--ink-soft);flex-shrink:0;}
+  .bar-track{flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--blue);border-radius:4px;}
+  .bar-count{width:28px;text-align:right;font-weight:500;}
+  .service-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;}
+  .service-item:last-child{border-bottom:none;}
+  .service-item .d{color:var(--red-text);font-weight:500;}
+
+  @media (max-width:700px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .row-date{display:none;}
+    .dash-grid{grid-template-columns:1fr;}
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div id="loginScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="panel" style="max-width:360px;width:100%;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <div class="mark" style="width:36px;height:36px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path d="M12 2c4 5 7 8.5 7 12.5A7 7 0 1 1 5 14.5C5 10.5 8 7 12 2z"/></svg>
+      </div>
+      <h2 style="margin:0;">Pure Pro login</h2>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="text" id="login-email" placeholder="you@purepro.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="loginError" style="color:var(--red-text);font-size:13px;margin-bottom:10px;"></div>
+    <button class="btn" id="loginBtn" style="width:100%;">Log in</button>
+  </div>
+</div>
+
+<div id="appRoot" style="display:none;">
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c4 5 7 8.5 7 12.5A7 7 0 1 1 5 14.5C5 10.5 8 7 12 2z"/></svg>
+      </div>
+      <div>
+        <h1>Pure Pro</h1>
+        <div class="tagline">Water filter systems — client ledger</div>
+      </div>
+    </div>
+    <div>
+      <button class="btn secondary" id="logoutBtn" style="margin-right:8px;">Log out</button>
+      <button class="btn secondary" id="scanBtn" style="margin-right:8px;">📷 Scan invoice</button>
+      <button class="btn" id="newBtn">+ Add contact</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="contacts">Contacts</div>
+    <div class="tab" data-tab="suburb">By suburb</div>
+    <div class="tab" data-tab="due">Due for service</div>
+    <div class="tab" data-tab="dashboard">Dashboard</div>
+    <div class="tab" data-tab="import">Import</div>
+  </div>
+
+  <div id="contactsTab">
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="Search name, address, phone...">
+    </div>
+    <div class="filters" id="filters"></div>
+
+    <div class="list" id="list"></div>
+    <div class="empty" id="emptyState" style="display:none;">
+      <div class="mark">No contacts yet</div>
+      <div>Add your first customer to get started.</div>
+    </div>
+    <div class="pagination" id="pagination" style="display:none;"></div>
+  </div>
+
+  <div id="suburbTab" style="display:none;">
+    <div class="toolbar">
+      <input type="text" id="suburbSearch" placeholder="Search suburb or name...">
+    </div>
+    <div id="suburbGroups"></div>
+  </div>
+
+  <div id="dueTab" style="display:none;">
+    <div class="filters" style="margin-bottom:14px;">
+      <button class="chip active" id="sortBySuburb">Sort by suburb</button>
+      <button class="chip" id="sortByName">Sort by name</button>
+    </div>
+    <div id="dueList"></div>
+  </div>
+
+  <div id="dashboardTab" style="display:none;">
+    <div class="dash-grid">
+      <div class="card">
+        <h3>Pipeline breakdown</h3>
+        <div id="pipelineBars"></div>
+      </div>
+      <div class="card">
+        <h3>Due for service (next 30 days)</h3>
+        <div id="serviceDue"></div>
+      </div>
+    </div>
+    <div class="dash-grid" style="margin-top:14px;">
+      <div class="card">
+        <h3>Sales</h3>
+        <div id="salesSummary"></div>
+      </div>
+      <div class="card">
+        <h3>Top customers by spend</h3>
+        <div id="topCustomers"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="importTab" style="display:none;">
+    <div class="card">
+      <h3>Import contacts from Excel</h3>
+      <div id="importStep1">
+        <p style="font-size:13.5px;color:var(--ink-soft);margin-top:0;">Choose your spreadsheet (.xlsx, .xls, or .csv). Your columns: Address, Suburb, Name, Contact number, System, Job, Last service, Invoice #, Price, Notes.</p>
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv">
+        <div id="importError" style="color:var(--red-text);font-size:13px;margin-top:10px;"></div>
+      </div>
+
+      <div id="importStep2" style="display:none;margin-top:16px;">
+        <h3 style="font-size:15px;">Match your columns</h3>
+        <p style="font-size:13px;color:var(--ink-soft);">We guessed these — fix any that look wrong.</p>
+        <div id="mappingGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"></div>
+
+        <div class="field" style="max-width:280px;">
+          <label>Pipeline stage for all imported contacts</label>
+          <select id="importStatus">
+            <option value="active_customer" selected>Active customer</option>
+            <option value="lead">Lead</option>
+            <option value="quote_sent">Quote sent</option>
+            <option value="scheduled_install">Scheduled install</option>
+            <option value="needs_service">Needs service</option>
+          </select>
+        </div>
+
+        <h3 style="font-size:15px;margin-top:16px;">Preview (first 3 rows)</h3>
+        <div id="importPreview" style="overflow-x:auto;"></div>
+
+        <div style="margin-top:16px;display:flex;gap:8px;">
+          <button class="btn secondary" id="importCancelBtn">Cancel</button>
+          <button class="btn" id="importConfirmBtn">Import all rows</button>
+        </div>
+      </div>
+
+      <div id="importStep3" style="display:none;margin-top:16px;">
+        <div class="stat" style="max-width:320px;">
+          <div class="num" id="importedCount"></div>
+          <div class="label">Contacts imported</div>
+        </div>
+        <button class="btn secondary" id="importAnotherBtn" style="margin-top:14px;">Import another file</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <h2 id="panelTitle">Add contact</h2>
+    <div class="field">
+      <label>Full name</label>
+      <input type="text" id="f-name" placeholder="Maya Rodriguez">
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Street address</label>
+        <input type="text" id="f-address" placeholder="128 Fern St">
+      </div>
+      <div class="field">
+        <label>Suburb</label>
+        <input type="text" id="f-suburb" placeholder="Austin">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Postcode <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+        <input type="text" id="f-postcode" placeholder="2000">
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="text" id="f-phone" placeholder="+1 415 555 0172">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Pipeline stage</label>
+        <select id="f-status">
+          <option value="lead">Lead</option>
+          <option value="quote_sent">Quote sent</option>
+          <option value="scheduled_install">Scheduled install</option>
+          <option value="active_customer">Active customer</option>
+          <option value="needs_service">Needs service</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>System installed</label>
+        <input type="text" id="f-system" placeholder="Whole-home 3-stage RO system">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Job / service type</label>
+        <input type="text" id="f-job" placeholder="Install, filter change, repair...">
+      </div>
+      <div class="field">
+        <label>Current invoice number</label>
+        <input type="text" id="f-invoice" placeholder="e.g. 4521 or INV-4521">
+        <div class="hint">Type in their existing number, or leave the suggestion.</div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Job price</label>
+        <input type="text" id="f-price" placeholder="e.g. 450">
+      </div>
+      <div class="field">
+        <label>Payment method</label>
+        <select id="f-payment">
+          <option value="">— Not set —</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="bank_transfer">Bank transfer</option>
+          <option value="cheque">Cheque</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="field">
+        <label>Last service date</label>
+        <input type="date" id="f-lastservice">
+        <div class="hint">Auto-fills from your most recent service record below.</div>
+      </div>
+      <div class="field">
+        <label>Next service date</label>
+        <input type="date" id="f-nextservice">
+        <div class="hint">Auto-set to 12 months after last service — you can override it.</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>General notes</label>
+      <textarea id="f-notes" placeholder="Access instructions, filter type, gate code..."></textarea>
+    </div>
+
+    <div class="field">
+      <details id="historyDetails">
+        <summary style="cursor:pointer;font-size:12.5px;color:var(--ink-soft);font-weight:500;">
+          Service history <span id="historyCount" style="color:var(--muted);font-weight:400;"></span> <span id="totalSpent" style="color:var(--muted);font-weight:400;"></span>
+        </summary>
+        <div style="margin-top:10px;">
+          <div id="historyList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px;">
+            <div class="two-col" style="margin-bottom:8px;">
+              <input type="date" id="h-date">
+              <input type="text" id="h-invoice" placeholder="Invoice # for this visit">
+            </div>
+            <div class="two-col" style="margin-bottom:8px;">
+              <input type="text" id="h-price" placeholder="Price for this visit">
+              <input type="text" id="h-job" placeholder="Job type (optional)">
+            </div>
+            <div class="field" style="margin-bottom:8px;">
+              <select id="h-payment">
+                <option value="">Payment method — not set</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="bank_transfer">Bank transfer</option>
+                <option value="cheque">Cheque</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <textarea id="h-notes" placeholder="What was done at this visit..." style="width:100%;min-height:44px;margin-bottom:8px;"></textarea>
+            <button class="btn secondary small" id="addHistoryBtn" type="button">+ Add service record</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn danger" id="deleteBtn" style="display:none;">Delete</button>
+      <div class="right">
+        <button class="btn secondary" id="cancelBtn">Cancel</button>
+        <button class="btn" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="scanOverlay">
+  <div class="panel">
+    <h2>Scan invoice</h2>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:0;">Take a photo of the invoice, or choose one from your camera roll. This costs a fraction of a cent to process.</p>
+
+    <div id="scanStep1">
+      <input type="file" id="scanFile" accept="image/*" capture="environment">
+      <div id="scanPreviewWrap" style="display:none;margin-top:12px;">
+        <img id="scanPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border);">
+      </div>
+      <div id="scanError" style="color:var(--red-text);font-size:13px;margin-top:10px;"></div>
+      <div class="panel-actions" style="justify-content:flex-end;">
+        <button class="btn secondary" id="scanCancelBtn">Cancel</button>
+        <button class="btn" id="scanExtractBtn" style="display:none;">Read invoice</button>
+      </div>
+    </div>
+
+    <div id="scanStep2" style="display:none;text-align:center;padding:20px 0;color:var(--ink-soft);font-size:14px;">
+      Reading invoice…
+    </div>
+  </div>
+</div>
+
+<script>
+// --- Your own Supabase database + login (replaces Claude's built-in storage) ---
+const SUPABASE_URL = 'https://zxtfwwqfrlrwivnvlfxp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_owaL_81ysx-Tp3nxofuW4w_uqd21Qaf';
+const SESSION_KEY = 'purepro_session';
+
+let session = null; // { access_token, refresh_token, expires_at }
+
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    session = raw ? JSON.parse(raw) : null;
+  }catch(e){ session = null; }
+}
+
+function persistSession(s){
+  session = s;
+  if(s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+  else localStorage.removeItem(SESSION_KEY);
+}
+
+async function login(email, password){
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error_description || data.msg || 'Login failed');
+  persistSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Date.now() + (data.expires_in * 1000)
+  });
+}
+
+async function refreshSession(){
+  if(!session || !session.refresh_token) return false;
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: 'POST',
+    headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: session.refresh_token })
+  });
+  if(!res.ok){ persistSession(null); return false; }
+  const data = await res.json();
+  persistSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Date.now() + (data.expires_in * 1000)
+  });
+  return true;
+}
+
+function logout(){
+  persistSession(null);
+  location.reload();
+}
+
+async function authFetch(url, options, retried){
+  if(session && session.expires_at < Date.now() + 10000){
+    await refreshSession();
+  }
+  const headers = Object.assign({}, options.headers, {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${session ? session.access_token : SUPABASE_KEY}`
+  });
+  const res = await fetch(url, { ...options, headers });
+  if(res.status === 401 && !retried){
+    const ok = await refreshSession();
+    if(ok) return authFetch(url, options, true);
+    persistSession(null);
+    showLoginScreen();
+    throw new Error('Session expired — please log in again.');
+  }
+  return res;
+}
+
+const storage = {
+  async get(key){
+    const res = await authFetch(
+      `${SUPABASE_URL}/rest/v1/kv_store?key=eq.${encodeURIComponent(key)}&select=value`,
+      { headers: {} }
+    );
+    if(!res.ok) throw new Error('Could not reach the database (get ' + key + ')');
+    const rows = await res.json();
+    if(!rows || rows.length === 0) return null;
+    return { value: rows[0].value };
+  },
+  async set(key, value){
+    const res = await authFetch(`${SUPABASE_URL}/rest/v1/kv_store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify([{ key, value }])
+    });
+    if(!res.ok) throw new Error('Could not save to the database (set ' + key + ')');
+    return { key, value };
+  }
+};
+
+function showLoginScreen(){
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appRoot').style.display = 'none';
+}
+
+function showApp(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+}
+
+document.getElementById('loginBtn').onclick = async ()=>{
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if(!email || !password){ errEl.textContent = 'Enter your email and password.'; return; }
+  try{
+    await login(email, password);
+    showApp();
+    loadContacts();
+  }catch(e){
+    errEl.textContent = e.message;
+  }
+};
+
+document.getElementById('logoutBtn').onclick = logout;
+
+async function initAuth(){
+  loadSession();
+  if(session && session.expires_at > Date.now()){
+    showApp();
+    loadContacts();
+  } else if(session && session.refresh_token){
+    const ok = await refreshSession();
+    if(ok){ showApp(); loadContacts(); }
+    else showLoginScreen();
+  } else {
+    showLoginScreen();
+  }
+}
+
+let contacts = [];
+let editingId = null;
+let currentHistory = [];
+let activeFilter = 'all';
+let currentPage = 1;
+let dueSortMode = 'suburb';
+const PAGE_SIZE = 50;
+const STORAGE_KEY = 'purepro-contacts';
+const COUNTER_KEY = 'purepro-invoice-counter';
+let invoiceCounter = 1000;
+let activeTab = 'contacts';
+
+function uid(){ return 'c' + Date.now() + Math.random().toString(36).slice(2,7); }
+
+async function loadContacts(){
+  try{
+    const res = await storage.get(STORAGE_KEY);
+    contacts = res ? JSON.parse(res.value) : [];
+  }catch(e){
+    contacts = [];
+    if(!/Session expired/.test(e.message)){
+      alert('Could not load your data from the database. Check your internet connection and reload the page. (' + e.message + ')');
+    }
+  }
+  try{
+    const res = await storage.get(COUNTER_KEY);
+    invoiceCounter = res ? JSON.parse(res.value) : 1000;
+  }catch(e){ invoiceCounter = 1000; }
+  render();
+}
+
+async function saveContacts(){
+  try{ await storage.set(STORAGE_KEY, JSON.stringify(contacts)); }
+  catch(e){
+    console.error('Storage error', e);
+    if(!/Session expired/.test(e.message)){
+      alert('Could not save to the database. Your last change may not have been saved — check your connection and try again. (' + e.message + ')');
+    }
+  }
+}
+
+async function saveCounter(){
+  try{ await storage.set(COUNTER_KEY, JSON.stringify(invoiceCounter)); }
+  catch(e){ console.error('Storage error', e); }
+}
+
+function statusLabel(s){
+  return {lead:'Lead', quote_sent:'Quote sent', scheduled_install:'Scheduled install', active_customer:'Active customer', needs_service:'Needs service'}[s] || s;
+}
+
+function paymentLabel(p){
+  return {cash:'Cash', card:'Card', bank_transfer:'Bank transfer', cheque:'Cheque', other:'Other'}[p] || p;
+}
+
+function addOneYear(dateStr){
+  if(!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d)) return '';
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0,10);
+}
+
+// The app stores dates internally as YYYY-MM-DD (required by <input type="date">).
+// This converts that to DD-MM-YYYY for display, matching how Pure Pro invoices are written.
+function formatDMY(dateStr){
+  if(!dateStr) return '';
+  const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return dateStr;
+  return `${m[3]}-${m[2]}-${m[1]}`;
+}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const target = new Date(dateStr + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.round((target - today) / 86400000);
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function fullAddress(c){
+  return [c.address, c.suburb, c.postcode].filter(Boolean).join(', ');
+}
+
+function getFiltered(){
+  const search = document.getElementById('search').value.toLowerCase();
+  const searchDigits = search.replace(/\D/g,'');
+  let filtered = contacts.filter(c=>{
+    const matchesSearch = !search ||
+      c.name.toLowerCase().includes(search) ||
+      (c.address||'').toLowerCase().includes(search) ||
+      (c.suburb||'').toLowerCase().includes(search) ||
+      (c.phone||'').toLowerCase().includes(search) ||
+      (searchDigits.length >= 3 && normalizePhone(c.phone).includes(searchDigits));
+    const matchesFilter = activeFilter === 'all' || c.status === activeFilter;
+    return matchesSearch && matchesFilter;
+  });
+  filtered.sort((a,b)=> (b.lastService||'').localeCompare(a.lastService||''));
+  return filtered;
+}
+
+function render(){
+  if(activeTab === 'contacts') renderContactsTab();
+  else if(activeTab === 'suburb') renderSuburbTab();
+  else if(activeTab === 'due') renderDueTab();
+  else renderDashboard();
+}
+
+function renderContactsTab(){
+  const filtered = getFiltered();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+  const pageItems = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  const list = document.getElementById('list');
+  const empty = document.getElementById('emptyState');
+  const pagination = document.getElementById('pagination');
+  list.innerHTML = '';
+
+  if(contacts.length === 0){
+    empty.style.display = 'block';
+    list.style.display = 'none';
+    pagination.style.display = 'none';
+  } else {
+    empty.style.display = 'none';
+    list.style.display = 'flex';
+    pageItems.forEach(c=>{
+      const due = daysUntil(c.nextService);
+      const dueClass = (due !== null && due <= 30) ? 'due' : '';
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.onclick = ()=> openEdit(c.id);
+      row.innerHTML = `
+        <div class="row-main">
+          <div class="row-name">${escapeHtml(c.name)}</div>
+          <div class="row-sub">${escapeHtml(fullAddress(c))}${fullAddress(c) && c.phone ? ' · ' : ''}${escapeHtml(c.phone||'')}</div>
+        </div>
+        <span class="pill ${c.status}">${statusLabel(c.status)}</span>
+        <div class="row-date">Next service: <span class="${dueClass}">${c.nextService ? formatDMY(c.nextService) : '—'}</span></div>
+      `;
+      list.appendChild(row);
+    });
+
+    if(totalPages > 1){
+      pagination.style.display = 'flex';
+      pagination.innerHTML = `
+        <button class="btn secondary small" id="prevPage">Prev</button>
+        <span>Page ${currentPage} of ${totalPages} (${filtered.length} contacts)</span>
+        <button class="btn secondary small" id="nextPage">Next</button>
+      `;
+      document.getElementById('prevPage').onclick = ()=>{ if(currentPage>1){ currentPage--; render(); } };
+      document.getElementById('nextPage').onclick = ()=>{ if(currentPage<totalPages){ currentPage++; render(); } };
+    } else {
+      pagination.style.display = 'none';
+    }
+  }
+
+  renderStats();
+  renderFilters();
+}
+
+function renderStats(){
+  const total = contacts.length;
+  const counts = {lead:0, quote_sent:0, scheduled_install:0, active_customer:0, needs_service:0};
+  contacts.forEach(c=>{ if(counts[c.status] !== undefined) counts[c.status]++; });
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="num">${total}</div><div class="label">Total contacts</div></div>
+    <div class="stat"><div class="num">${counts.lead}</div><div class="label">Leads</div></div>
+    <div class="stat"><div class="num">${counts.quote_sent}</div><div class="label">Quote sent</div></div>
+    <div class="stat"><div class="num">${counts.active_customer}</div><div class="label">Active</div></div>
+    <div class="stat"><div class="num">${counts.needs_service}</div><div class="label">Needs service</div></div>
+  `;
+}
+
+function renderFilters(){
+  const filters = [
+    {key:'all', label:'All'},
+    {key:'lead', label:'Lead'},
+    {key:'quote_sent', label:'Quote sent'},
+    {key:'scheduled_install', label:'Scheduled install'},
+    {key:'active_customer', label:'Active customer'},
+    {key:'needs_service', label:'Needs service'},
+  ];
+  document.getElementById('filters').innerHTML = filters.map(f=>
+    `<button class="chip ${activeFilter===f.key?'active':''}" data-key="${f.key}">${f.label}</button>`
+  ).join('');
+  document.querySelectorAll('#filters .chip').forEach(el=>{
+    el.onclick = ()=>{ activeFilter = el.dataset.key; currentPage = 1; render(); };
+  });
+}
+
+function renderSuburbTab(){
+  const search = document.getElementById('suburbSearch').value.toLowerCase();
+  const filtered = contacts.filter(c=>
+    !search || (c.suburb||'').toLowerCase().includes(search) || c.name.toLowerCase().includes(search)
+  );
+
+  const groups = {};
+  filtered.forEach(c=>{
+    const key = (c.suburb||'').trim() || 'No suburb set';
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  });
+
+  const suburbNames = Object.keys(groups).sort((a,b)=> a.localeCompare(b));
+  const container = document.getElementById('suburbGroups');
+
+  if(suburbNames.length === 0){
+    container.innerHTML = `<div class="empty"><div class="mark">No contacts yet</div><div>Add a contact with a suburb to see it grouped here.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = suburbNames.map(suburb=>{
+    const people = groups[suburb].slice().sort((a,b)=> a.name.localeCompare(b.name));
+    return `
+      <div class="card" style="margin-bottom:12px;">
+        <h3>${escapeHtml(suburb)} <span style="color:var(--muted);font-weight:400;font-size:13px;">(${people.length})</span></h3>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${people.map(c=>`
+            <div class="service-item" style="cursor:pointer;" data-id="${c.id}">
+              <span>${escapeHtml(c.name)} <span style="color:var(--muted);">— ${escapeHtml(c.address||'')}</span></span>
+              <span class="pill ${c.status}" style="font-size:10.5px;">${statusLabel(c.status)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('[data-id]').forEach(el=>{
+    el.onclick = ()=> openEdit(el.dataset.id);
+  });
+}
+
+function renderDueTab(){
+  document.getElementById('sortBySuburb').classList.toggle('active', dueSortMode === 'suburb');
+  document.getElementById('sortByName').classList.toggle('active', dueSortMode === 'name');
+
+  const due = contacts.filter(c=> c.nextService);
+  let sorted;
+  if(dueSortMode === 'suburb'){
+    sorted = due.slice().sort((a,b)=>{
+      const s = (a.suburb||'').localeCompare(b.suburb||'');
+      return s !== 0 ? s : a.name.localeCompare(b.name);
+    });
+  } else {
+    sorted = due.slice().sort((a,b)=> a.name.localeCompare(b.name));
+  }
+
+  const container = document.getElementById('dueList');
+  if(sorted.length === 0){
+    container.innerHTML = `<div class="empty"><div class="mark">Nothing scheduled</div><div>Contacts with a next service date will show up here.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="list">` + sorted.map(c=>{
+    const d = daysUntil(c.nextService);
+    const overdue = d !== null && d < 0;
+    const dueClass = overdue ? 'due' : '';
+    const label = d === null ? '' : (overdue ? `${Math.abs(d)}d overdue` : `in ${d}d`);
+    return `
+      <div class="row" data-id="${c.id}">
+        <div class="row-main">
+          <div class="row-name">${escapeHtml(c.name)}</div>
+          <div class="row-sub">${escapeHtml(fullAddress(c))}</div>
+        </div>
+        <div class="row-date" style="width:auto;"><span class="${dueClass}">${formatDMY(c.nextService)} (${label})</span></div>
+      </div>
+    `;
+  }).join('') + `</div>`;
+
+  container.querySelectorAll('[data-id]').forEach(el=>{
+    el.onclick = ()=> openEdit(el.dataset.id);
+  });
+}
+
+function renderDashboard(){
+  const stages = [
+    {key:'lead', label:'Lead'},
+    {key:'quote_sent', label:'Quote sent'},
+    {key:'scheduled_install', label:'Scheduled install'},
+    {key:'active_customer', label:'Active customer'},
+    {key:'needs_service', label:'Needs service'},
+  ];
+  const total = contacts.length || 1;
+  document.getElementById('pipelineBars').innerHTML = stages.map(s=>{
+    const count = contacts.filter(c=>c.status===s.key).length;
+    const pct = Math.round((count/total)*100);
+    return `<div class="bar-row">
+      <div class="bar-label">${s.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-count">${count}</div>
+    </div>`;
+  }).join('');
+
+  const dueSoon = contacts
+    .filter(c=> c.nextService && daysUntil(c.nextService) !== null && daysUntil(c.nextService) <= 30)
+    .sort((a,b)=> (a.nextService||'').localeCompare(b.nextService||''));
+
+  const serviceDue = document.getElementById('serviceDue');
+  if(dueSoon.length === 0){
+    serviceDue.innerHTML = `<div style="color:var(--muted);font-size:13.5px;">Nothing due in the next 30 days.</div>`;
+  } else {
+    serviceDue.innerHTML = dueSoon.map(c=>{
+      const d = daysUntil(c.nextService);
+      const label = d < 0 ? `${Math.abs(d)}d overdue` : `in ${d}d`;
+      return `<div class="service-item"><span>${escapeHtml(c.name)}</span><span class="d">${label}</span></div>`;
+    }).join('');
+  }
+
+  const customerTotals = contacts.map(c=>{
+    const total = (c.serviceHistory||[]).reduce((sum,h)=> sum + (parseFloat(h.price) || 0), 0);
+    return { name: c.name, total };
+  });
+  const grandTotal = customerTotals.reduce((sum,c)=> sum + c.total, 0);
+  const customersWithSales = customerTotals.filter(c=>c.total > 0).length;
+  const avg = customersWithSales ? grandTotal / customersWithSales : 0;
+
+  document.getElementById('salesSummary').innerHTML = `
+    <div class="bar-row" style="margin-bottom:6px;"><div class="bar-label">Total sales</div><div style="font-family:'Source Serif 4',serif;font-size:20px;font-weight:600;">$${grandTotal.toLocaleString(undefined,{maximumFractionDigits:2})}</div></div>
+    <div class="bar-row"><div class="bar-label">Avg per paying customer</div><div style="font-size:14px;">$${avg.toLocaleString(undefined,{maximumFractionDigits:2})}</div></div>
+  `;
+
+  const top = customerTotals.filter(c=>c.total > 0).sort((a,b)=> b.total - a.total).slice(0,5);
+  document.getElementById('topCustomers').innerHTML = top.length === 0
+    ? `<div style="color:var(--muted);font-size:13.5px;">No priced jobs recorded yet.</div>`
+    : top.map(c=> `<div class="service-item"><span>${escapeHtml(c.name)}</span><span>$${c.total.toLocaleString(undefined,{maximumFractionDigits:2})}</span></div>`).join('');
+}
+
+function renderHistoryList(){
+  const el = document.getElementById('historyList');
+  const totalEl = document.getElementById('totalSpent');
+  const countEl = document.getElementById('historyCount');
+  const total = currentHistory.reduce((sum,h)=> sum + (parseFloat(h.price) || 0), 0);
+  totalEl.textContent = total > 0 ? `— total spent: $${total.toLocaleString(undefined,{maximumFractionDigits:2})}` : '';
+  countEl.textContent = currentHistory.length > 0
+    ? `(${currentHistory.length} record${currentHistory.length === 1 ? '' : 's'})`
+    : '(no records yet)';
+
+  if(currentHistory.length === 0){
+    el.innerHTML = `<div style="color:var(--muted);font-size:13px;">No past service records yet.</div>`;
+    return;
+  }
+  const sorted = currentHistory.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  el.innerHTML = sorted.map(h=>`
+    <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+      <div>
+        <div><strong>${escapeHtml(h.date ? formatDMY(h.date) : '—')}</strong>${h.invoiceNumber ? ' · Invoice #' + escapeHtml(h.invoiceNumber) : ''}${h.price ? ' · $' + escapeHtml(String(h.price)) : ''}${h.job ? ' · ' + escapeHtml(h.job) : ''}${h.payment ? ' · ' + escapeHtml(paymentLabel(h.payment)) : ''}</div>
+        ${h.notes ? `<div style="color:var(--ink-soft);margin-top:2px;">${escapeHtml(h.notes)}</div>` : ''}
+      </div>
+      <button class="btn secondary small" data-hid="${h.id}" type="button" style="flex-shrink:0;">Remove</button>
+    </div>
+  `).join('');
+  el.querySelectorAll('[data-hid]').forEach(btn=>{
+    btn.onclick = ()=>{
+      currentHistory = currentHistory.filter(h=>h.id !== btn.dataset.hid);
+      renderHistoryList();
+      recalcServiceDatesFromHistory();
+    };
+  });
+}
+
+function recalcServiceDatesFromHistory(){
+  if(currentHistory.length === 0) return;
+  const latest = currentHistory.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''))[0];
+  if(latest && latest.date){
+    document.getElementById('f-lastservice').value = latest.date;
+    const nextField = document.getElementById('f-nextservice');
+    if(nextField.dataset.auto !== 'false'){
+      nextField.value = addOneYear(latest.date);
+    }
+  }
+}
+
+document.getElementById('addHistoryBtn').onclick = ()=>{
+  const date = document.getElementById('h-date').value;
+  const invoiceNumber = document.getElementById('h-invoice').value.trim();
+  const price = document.getElementById('h-price').value.trim();
+  const job = document.getElementById('h-job').value.trim();
+  const payment = document.getElementById('h-payment').value;
+  const notes = document.getElementById('h-notes').value.trim();
+  if(!date && !invoiceNumber && !notes && !price && !job && !payment) return;
+  currentHistory.push({ id: uid(), date, invoiceNumber, price, job, payment, notes });
+  document.getElementById('h-date').value = '';
+  document.getElementById('h-invoice').value = '';
+  document.getElementById('h-price').value = '';
+  document.getElementById('h-job').value = '';
+  document.getElementById('h-payment').value = '';
+  document.getElementById('h-notes').value = '';
+  renderHistoryList();
+  recalcServiceDatesFromHistory();
+  document.getElementById('historyDetails').open = true;
+};
+
+function openNew(){
+  editingId = null;
+  currentHistory = [];
+  document.getElementById('panelTitle').textContent = 'Add contact';
+  document.getElementById('deleteBtn').style.display = 'none';
+  ['name','address','suburb','postcode','phone','system','job','price','notes'].forEach(f=> document.getElementById('f-'+f).value = '');
+  document.getElementById('f-invoice').value = (invoiceCounter + 1);
+  document.getElementById('f-status').value = 'lead';
+  document.getElementById('f-payment').value = '';
+  document.getElementById('f-lastservice').value = '';
+  document.getElementById('f-nextservice').value = '';
+  document.getElementById('f-nextservice').dataset.auto = 'true';
+  renderHistoryList();
+  document.getElementById('overlay').classList.add('open');
+}
+
+function openEdit(id){
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+  editingId = id;
+  currentHistory = (c.serviceHistory || []).slice();
+  document.getElementById('panelTitle').textContent = 'Edit contact';
+  document.getElementById('deleteBtn').style.display = 'inline-block';
+  document.getElementById('f-name').value = c.name || '';
+  document.getElementById('f-address').value = c.address || '';
+  document.getElementById('f-suburb').value = c.suburb || '';
+  document.getElementById('f-postcode').value = c.postcode || '';
+  document.getElementById('f-phone').value = c.phone || '';
+  document.getElementById('f-status').value = c.status || 'lead';
+  document.getElementById('f-system').value = c.system || '';
+  document.getElementById('f-job').value = c.job || '';
+  document.getElementById('f-price').value = c.price || '';
+  document.getElementById('f-payment').value = c.payment || '';
+  document.getElementById('f-invoice').value = c.invoiceNumber || '';
+  document.getElementById('f-lastservice').value = c.lastService || '';
+  document.getElementById('f-nextservice').value = c.nextService || '';
+  document.getElementById('f-nextservice').dataset.auto = 'true';
+  document.getElementById('f-notes').value = c.notes || '';
+  renderHistoryList();
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closePanel(){ document.getElementById('overlay').classList.remove('open'); }
+
+document.getElementById('f-lastservice').addEventListener('change', (e)=>{
+  const nextField = document.getElementById('f-nextservice');
+  if(!nextField.value || nextField.dataset.auto !== 'false'){
+    nextField.value = addOneYear(e.target.value);
+    nextField.dataset.auto = 'true';
+  }
+});
+document.getElementById('f-nextservice').addEventListener('input', (e)=>{
+  e.target.dataset.auto = 'false';
+});
+
+async function saveContact(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name){ document.getElementById('f-name').focus(); return; }
+
+  const invoiceNumber = document.getElementById('f-invoice').value.trim();
+  const numericInvoice = parseInt(invoiceNumber, 10);
+  if(!isNaN(numericInvoice) && numericInvoice > invoiceCounter){
+    invoiceCounter = numericInvoice;
+    await saveCounter();
+  }
+
+  const data = {
+    name,
+    address: document.getElementById('f-address').value.trim(),
+    suburb: document.getElementById('f-suburb').value.trim(),
+    postcode: document.getElementById('f-postcode').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    status: document.getElementById('f-status').value,
+    system: document.getElementById('f-system').value.trim(),
+    job: document.getElementById('f-job').value.trim(),
+    price: document.getElementById('f-price').value.trim(),
+    payment: document.getElementById('f-payment').value,
+    invoiceNumber,
+    lastService: document.getElementById('f-lastservice').value,
+    nextService: document.getElementById('f-nextservice').value,
+    notes: document.getElementById('f-notes').value.trim(),
+    serviceHistory: currentHistory,
+  };
+
+  if(editingId){
+    const idx = contacts.findIndex(c=>c.id===editingId);
+    contacts[idx] = {...contacts[idx], ...data};
+  } else {
+    contacts.push({id: uid(), ...data});
+  }
+
+  await saveContacts();
+  closePanel();
+  render();
+}
+
+async function deleteContact(){
+  if(!editingId) return;
+  contacts = contacts.filter(c=>c.id!==editingId);
+  await saveContacts();
+  closePanel();
+  render();
+}
+
+document.getElementById('newBtn').onclick = openNew;
+document.getElementById('cancelBtn').onclick = closePanel;
+document.getElementById('saveBtn').onclick = saveContact;
+document.getElementById('deleteBtn').onclick = deleteContact;
+document.getElementById('overlay').onclick = (e)=>{ if(e.target.id==='overlay') closePanel(); };
+document.getElementById('search').oninput = ()=>{ currentPage = 1; render(); };
+document.getElementById('suburbSearch').oninput = render;
+document.getElementById('sortBySuburb').onclick = ()=>{ dueSortMode = 'suburb'; render(); };
+document.getElementById('sortByName').onclick = ()=>{ dueSortMode = 'name'; render(); };
+
+const tabPanels = { contacts: 'contactsTab', suburb: 'suburbTab', due: 'dueTab', dashboard: 'dashboardTab', import: 'importTab' };
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    Object.entries(tabPanels).forEach(([key, id])=>{
+      document.getElementById(id).style.display = (key === activeTab) ? 'block' : 'none';
+    });
+    render();
+  };
+});
+
+const importFieldDefs = [
+  {key:'name', label:'Name', required:true, keywords:['name','customer','client']},
+  {key:'address', label:'Address', keywords:['address','street']},
+  {key:'suburb', label:'Suburb', keywords:['suburb','city','town']},
+  {key:'postcode', label:'Postcode', keywords:['postcode','postalcode','zip']},
+  {key:'phone', label:'Phone', keywords:['contactnumber','phone','mobile','number','contact']},
+  {key:'system', label:'System installed', keywords:['system']},
+  {key:'job', label:'Job / service type', keywords:['job']},
+  {key:'lastService', label:'Last service date', keywords:['lastservice','servicedate','last']},
+  {key:'invoiceNumber', label:'Invoice #', keywords:['invoice']},
+  {key:'price', label:'Price', keywords:['price','amount','cost']},
+  {key:'payment', label:'Payment method', keywords:['payment','paymentmethod','paidby']},
+  {key:'notes', label:'Notes', keywords:['notes','note','comment']},
+];
+let importHeaders = [];
+let importRows = [];
+
+function normalizeHeader(h){ return String(h||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+
+function guessMapping(){
+  const mapping = {};
+  importFieldDefs.forEach(f=>{
+    let match = importHeaders.find(h=> f.keywords.some(k=> normalizeHeader(h).includes(k)));
+    mapping[f.key] = match || '';
+  });
+  return mapping;
+}
+
+function parseDateFlexible(v){
+  if(v === null || v === undefined || v === '') return '';
+  if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+  const s = String(v).trim();
+  if(!s) return '';
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){
+    let a = parseInt(m[1],10), b = parseInt(m[2],10), y = m[3];
+    if(y.length===2) y = '20'+y;
+    let day, month;
+    if(a>12){ day=a; month=b; } else if(b>12){ day=b; month=a; } else { day=a; month=b; }
+    return `${y}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  const d = new Date(s);
+  if(!isNaN(d)) return d.toISOString().slice(0,10);
+  return '';
+}
+
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const errEl = document.getElementById('importError');
+  errEl.textContent = '';
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    try{
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:'', raw:false});
+      if(rows.length < 2){
+        errEl.textContent = 'That file looks empty — no data rows found below the header.';
+        return;
+      }
+      importHeaders = rows[0].map(h=> String(h).trim());
+      importRows = rows.slice(1).filter(r=> r.some(cell=> String(cell).trim() !== ''));
+      showMappingStep();
+    }catch(err){
+      errEl.textContent = 'Could not read that file. Make sure it\'s a valid .xlsx, .xls, or .csv file.';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function showMappingStep(){
+  document.getElementById('importStep2').style.display = 'block';
+  const mapping = guessMapping();
+  const grid = document.getElementById('mappingGrid');
+  grid.innerHTML = importFieldDefs.map(f=>{
+    const options = ['<option value="">— Not mapped —</option>']
+      .concat(importHeaders.map(h=> `<option value="${escapeHtml(h)}" ${mapping[f.key]===h?'selected':''}>${escapeHtml(h)}</option>`));
+    return `
+      <div class="field">
+        <label>${f.label}${f.required?' *':''}</label>
+        <select id="map-${f.key}" data-key="${f.key}">${options.join('')}</select>
+      </div>
+    `;
+  }).join('');
+  grid.querySelectorAll('select').forEach(sel=> sel.onchange = updateImportPreview);
+  updateImportPreview();
+}
+
+function currentImportMapping(){
+  const mapping = {};
+  importFieldDefs.forEach(f=>{
+    mapping[f.key] = document.getElementById('map-'+f.key).value;
+  });
+  return mapping;
+}
+
+function updateImportPreview(){
+  const mapping = currentImportMapping();
+  const preview = importRows.slice(0,3);
+  const cols = importFieldDefs.filter(f=> mapping[f.key]);
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:12.5px;"><thead><tr>';
+  cols.forEach(f=> html += `<th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--ink-soft);">${f.label}</th>`);
+  html += '</tr></thead><tbody>';
+  preview.forEach(row=>{
+    html += '<tr>';
+    cols.forEach(f=>{
+      const idx = importHeaders.indexOf(mapping[f.key]);
+      html += `<td style="padding:6px 8px;border-bottom:1px solid var(--border);">${escapeHtml(idx>=0 ? row[idx] : '')}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('importPreview').innerHTML = html;
+}
+
+document.getElementById('importCancelBtn').onclick = ()=>{
+  document.getElementById('importStep2').style.display = 'none';
+  document.getElementById('importFile').value = '';
+};
+
+document.getElementById('importConfirmBtn').onclick = async ()=>{
+  const mapping = currentImportMapping();
+  if(!mapping.name){
+    alert('Please map a column to Name before importing — it\'s required.');
+    return;
+  }
+  const defaultStatus = document.getElementById('importStatus').value;
+  const idx = key => importHeaders.indexOf(mapping[key]);
+  const idxs = {};
+  importFieldDefs.forEach(f=> idxs[f.key] = idx(f.key));
+
+  let count = 0;
+  importRows.forEach(row=>{
+    const val = key => (idxs[key] >= 0 ? String(row[idxs[key]] || '').trim() : '');
+    const name = val('name');
+    if(!name) return;
+
+    const lastService = parseDateFlexible(val('lastService'));
+    const nextService = lastService ? addOneYear(lastService) : '';
+    const invoiceNumber = val('invoiceNumber');
+    const price = val('price');
+    const job = val('job');
+    const payment = val('payment');
+    const notes = val('notes');
+
+    const numericInvoice = parseInt(invoiceNumber, 10);
+    if(!isNaN(numericInvoice) && numericInvoice > invoiceCounter){
+      invoiceCounter = numericInvoice;
+    }
+
+    const serviceHistory = [];
+    if(lastService || invoiceNumber || price || notes || job || payment){
+      serviceHistory.push({ id: uid(), date: lastService, invoiceNumber, price, job, payment, notes });
+    }
+
+    contacts.push({
+      id: uid(),
+      name,
+      address: val('address'),
+      suburb: val('suburb'),
+      postcode: val('postcode'),
+      phone: val('phone'),
+      system: val('system'),
+      job,
+      price,
+      payment,
+      invoiceNumber,
+      status: defaultStatus,
+      lastService,
+      nextService,
+      notes,
+      serviceHistory,
+    });
+    count++;
+  });
+
+  await saveContacts();
+  await saveCounter();
+
+  document.getElementById('importStep2').style.display = 'none';
+  document.getElementById('importStep3').style.display = 'block';
+  document.getElementById('importedCount').textContent = count;
+  render();
+};
+
+document.getElementById('importAnotherBtn').onclick = ()=>{
+  document.getElementById('importStep3').style.display = 'none';
+  document.getElementById('importFile').value = '';
+  document.getElementById('importError').textContent = '';
+};
+
+// --- Photo-of-invoice scanning ---
+let scanImageBase64 = null;
+let scanImageMediaType = null;
+
+function openScanModal(){
+  document.getElementById('scanFile').value = '';
+  document.getElementById('scanPreviewWrap').style.display = 'none';
+  document.getElementById('scanExtractBtn').style.display = 'none';
+  document.getElementById('scanError').textContent = '';
+  document.getElementById('scanStep1').style.display = 'block';
+  document.getElementById('scanStep2').style.display = 'none';
+  scanImageBase64 = null;
+  document.getElementById('scanOverlay').classList.add('open');
+}
+
+function closeScanModal(){
+  document.getElementById('scanOverlay').classList.remove('open');
+}
+
+document.getElementById('scanBtn').onclick = openScanModal;
+document.getElementById('scanCancelBtn').onclick = closeScanModal;
+document.getElementById('scanOverlay').onclick = (e)=>{ if(e.target.id === 'scanOverlay') closeScanModal(); };
+
+document.getElementById('scanFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  document.getElementById('scanError').textContent = '';
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      // Shrink large phone photos before sending — full-size originals are
+      // several MB and can fail to upload reliably over mobile data.
+      const maxDim = 1600;
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        if(width > height){ height = Math.round(height * (maxDim / width)); width = maxDim; }
+        else { width = Math.round(width * (maxDim / height)); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      scanImageBase64 = dataUrl.split(',')[1];
+      scanImageMediaType = 'image/jpeg';
+      document.getElementById('scanPreview').src = dataUrl;
+      document.getElementById('scanPreviewWrap').style.display = 'block';
+      document.getElementById('scanExtractBtn').style.display = 'inline-block';
+    };
+    img.onerror = ()=>{
+      document.getElementById('scanError').textContent = 'Could not load that photo — try a different one.';
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('scanExtractBtn').onclick = async ()=>{
+  if(!scanImageBase64) return;
+  document.getElementById('scanStep1').style.display = 'none';
+  document.getElementById('scanStep2').style.display = 'block';
+
+  try{
+    const res = await authFetch(`${SUPABASE_URL}/functions/v1/bright-responder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: scanImageBase64, mediaType: scanImageMediaType })
+    });
+    if(!res.ok){
+      const errText = await res.text();
+      throw new Error('The scan function returned an error: ' + errText.slice(0,200));
+    }
+    const extracted = await res.json();
+    if(extracted.error) throw new Error(extracted.error);
+
+    applyExtractedInvoice(extracted);
+    closeScanModal();
+  }catch(err){
+    document.getElementById('scanStep1').style.display = 'block';
+    document.getElementById('scanStep2').style.display = 'none';
+    document.getElementById('scanError').textContent = 'Could not read that invoice: ' + err.message;
+  }
+};
+
+function normalizePhone(p){
+  return String(p||'').replace(/\D/g,'');
+}
+
+function normalizeAddress(a){
+  return String(a||'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function findMatchingContact(ex){
+  const nameLower = (ex.name||'').trim().toLowerCase();
+  if(nameLower){
+    const byName = contacts.find(c=> c.name.trim().toLowerCase() === nameLower);
+    if(byName) return { contact: byName, matchedBy: 'name' };
+  }
+  const phoneDigits = normalizePhone(ex.phone);
+  if(phoneDigits.length >= 6){
+    const byPhone = contacts.find(c=> normalizePhone(c.phone) === phoneDigits);
+    if(byPhone) return { contact: byPhone, matchedBy: 'phone number' };
+  }
+  const addrKey = normalizeAddress(ex.address);
+  if(addrKey.length >= 4){
+    const byAddress = contacts.find(c=> normalizeAddress(c.address) === addrKey);
+    if(byAddress) return { contact: byAddress, matchedBy: 'address' };
+  }
+  return null;
+}
+
+function findDuplicateInvoiceNumber(invoiceNumber){
+  const num = String(invoiceNumber||'').trim().toLowerCase();
+  if(!num) return null;
+  for(const c of contacts){
+    if(String(c.invoiceNumber||'').trim().toLowerCase() === num){
+      return { contact: c, date: c.lastService };
+    }
+    const hit = (c.serviceHistory||[]).find(h=> String(h.invoiceNumber||'').trim().toLowerCase() === num);
+    if(hit) return { contact: c, date: hit.date };
+  }
+  return null;
+}
+
+function applyExtractedInvoice(ex){
+  if(ex.invoiceNumber){
+    const dup = findDuplicateInvoiceNumber(ex.invoiceNumber);
+    if(dup){
+      const dateNote = dup.date ? ' dated ' + formatDMY(dup.date) : '';
+      const proceed = confirm(
+        'Invoice #' + ex.invoiceNumber + ' already exists in your records, for "' + dup.contact.name + '"' + dateNote + '.\n\n' +
+        'This usually means the same invoice got scanned twice. Tap OK to add it anyway, or Cancel to stop.'
+      );
+      if(!proceed) return;
+    }
+  }
+
+  // Convert the AI's DD-MM-YYYY date to the YYYY-MM-DD our date inputs need.
+  let isoDate = '';
+  if(ex.date){
+    const m = String(ex.date).trim().match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    if(m){
+      let y = m[3]; if(y.length===2) y = '20'+y;
+      isoDate = `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    }
+  }
+
+  const match = findMatchingContact(ex);
+  const existing = match ? match.contact : null;
+
+  const historyEntry = {
+    id: uid(),
+    date: isoDate,
+    invoiceNumber: ex.invoiceNumber || '',
+    price: ex.price || '',
+    job: ex.job || '',
+    payment: '',
+    notes: ex.notes || ''
+  };
+
+  if(existing){
+    openEdit(existing.id);
+    currentHistory.push(historyEntry);
+    renderHistoryList();
+    recalcServiceDatesFromHistory();
+    document.getElementById('historyDetails').open = true;
+    if(ex.address) document.getElementById('f-address').value = ex.address;
+    if(ex.suburb) document.getElementById('f-suburb').value = ex.suburb;
+    if(ex.postcode) document.getElementById('f-postcode').value = ex.postcode;
+    if(ex.phone) document.getElementById('f-phone').value = ex.phone;
+    if(ex.system) document.getElementById('f-system').value = ex.system;
+    if(ex.job) document.getElementById('f-job').value = ex.job;
+    if(ex.price) document.getElementById('f-price').value = ex.price;
+    if(ex.invoiceNumber) document.getElementById('f-invoice').value = ex.invoiceNumber;
+    alert('Found an existing contact for "' + existing.name + '" (matched by ' + match.matchedBy + ') — added this visit to their service history. Review the details (especially the name, if this was matched by phone or address) and hit Save to confirm.');
+  } else {
+    openNew();
+    currentHistory.push(historyEntry);
+    renderHistoryList();
+    recalcServiceDatesFromHistory();
+    document.getElementById('historyDetails').open = true;
+    document.getElementById('f-name').value = ex.name || '';
+    document.getElementById('f-address').value = ex.address || '';
+    document.getElementById('f-suburb').value = ex.suburb || '';
+    document.getElementById('f-postcode').value = ex.postcode || '';
+    document.getElementById('f-phone').value = ex.phone || '';
+    document.getElementById('f-system').value = ex.system || '';
+    document.getElementById('f-job').value = ex.job || '';
+    document.getElementById('f-price').value = ex.price || '';
+    if(ex.invoiceNumber) document.getElementById('f-invoice').value = ex.invoiceNumber;
+    document.getElementById('f-status').value = 'active_customer';
+    alert('No existing contact matched "' + (ex.name || 'this name') + '" — created a new one. Review the details and hit Save to confirm.');
+  }
+}
+
+initAuth();
+</script>
+</body>
+</html>
