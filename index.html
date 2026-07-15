@@ -1457,15 +1457,29 @@ function normalizeInvoiceNumber(v){
   return digits.replace(/^0+(?=\d)/, '');
 }
 
+function splitInvoiceNumbers(v){
+  const raw = String(v||'').trim();
+  if(!raw) return [];
+  // Some records have multiple invoice numbers bundled into one field,
+  // e.g. "109,163" or "459 & 63,126" — split those apart before comparing,
+  // otherwise they'd get mashed into one meaningless number.
+  return raw.split(/,|&|\band\b/i).map(p=>p.trim()).filter(Boolean);
+}
+
 function findDuplicateInvoiceNumber(invoiceNumber){
   const num = normalizeInvoiceNumber(invoiceNumber);
   if(!num) return null;
   for(const c of contacts){
-    if(normalizeInvoiceNumber(c.invoiceNumber) === num){
+    const currentParts = splitInvoiceNumbers(c.invoiceNumber);
+    if(currentParts.some(p=> normalizeInvoiceNumber(p) === num)){
       return { contact: c, date: c.lastService };
     }
-    const hit = (c.serviceHistory||[]).find(h=> normalizeInvoiceNumber(h.invoiceNumber) === num);
-    if(hit) return { contact: c, date: hit.date };
+    for(const h of (c.serviceHistory||[])){
+      const historyParts = splitInvoiceNumbers(h.invoiceNumber);
+      if(historyParts.some(p=> normalizeInvoiceNumber(p) === num)){
+        return { contact: c, date: h.date };
+      }
+    }
   }
   return null;
 }
@@ -1485,9 +1499,9 @@ function applyExtractedInvoice(ex){
       const scannedNorm = normalizeInvoiceNumber(ex.invoiceNumber);
       const allExisting = [];
       contacts.forEach(c=>{
-        if(c.invoiceNumber) allExisting.push(c.name + ': current="' + c.invoiceNumber + '" → normalized="' + normalizeInvoiceNumber(c.invoiceNumber) + '"');
+        if(c.invoiceNumber) allExisting.push(c.name + ': current="' + c.invoiceNumber + '" → parts=[' + splitInvoiceNumbers(c.invoiceNumber).map(normalizeInvoiceNumber).join(', ') + ']');
         (c.serviceHistory||[]).forEach(h=>{
-          if(h.invoiceNumber) allExisting.push(c.name + ': history="' + h.invoiceNumber + '" → normalized="' + normalizeInvoiceNumber(h.invoiceNumber) + '"');
+          if(h.invoiceNumber) allExisting.push(c.name + ': history="' + h.invoiceNumber + '" → parts=[' + splitInvoiceNumbers(h.invoiceNumber).map(normalizeInvoiceNumber).join(', ') + ']');
         });
       });
       alert(
