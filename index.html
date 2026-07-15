@@ -1469,6 +1469,22 @@ function applyExtractedInvoice(ex){
         'This usually means the same invoice got scanned twice. Tap OK to add it anyway, or Cancel to stop.'
       );
       if(!proceed) return;
+    } else {
+      // TEMPORARY DIAGNOSTIC — remove once the matching issue is confirmed fixed.
+      const scannedNorm = normalizeInvoiceNumber(ex.invoiceNumber);
+      const allExisting = [];
+      contacts.forEach(c=>{
+        if(c.invoiceNumber) allExisting.push(c.name + ': current="' + c.invoiceNumber + '" → normalized="' + normalizeInvoiceNumber(c.invoiceNumber) + '"');
+        (c.serviceHistory||[]).forEach(h=>{
+          if(h.invoiceNumber) allExisting.push(c.name + ': history="' + h.invoiceNumber + '" → normalized="' + normalizeInvoiceNumber(h.invoiceNumber) + '"');
+        });
+      });
+      alert(
+        'DIAGNOSTIC — no duplicate found.\n\n' +
+        'Scanned invoice: "' + ex.invoiceNumber + '" → normalized: "' + scannedNorm + '"\n\n' +
+        'Checked against ' + contacts.length + ' contact(s):\n' +
+        (allExisting.length ? allExisting.join('\n') : '(no invoice numbers found on any contact at all)')
+      );
     }
   }
 
