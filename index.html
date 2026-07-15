@@ -165,6 +165,7 @@
     </div>
     <div>
       <button class="btn secondary" id="logoutBtn" style="margin-right:8px;">Log out</button>
+      <button class="btn secondary" id="scanBtn" style="margin-right:8px;">📷 Scan invoice</button>
       <button class="btn" id="newBtn">+ Add contact</button>
     </div>
   </header>
@@ -297,9 +298,15 @@
     </div>
     <div class="two-col">
       <div class="field">
+        <label>Postcode <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+        <input type="text" id="f-postcode" placeholder="2000">
+      </div>
+      <div class="field">
         <label>Phone</label>
         <input type="text" id="f-phone" placeholder="+1 415 555 0172">
       </div>
+    </div>
+    <div class="two-col">
       <div class="field">
         <label>Pipeline stage</label>
         <select id="f-status">
@@ -310,26 +317,37 @@
           <option value="needs_service">Needs service</option>
         </select>
       </div>
-    </div>
-    <div class="two-col">
       <div class="field">
         <label>System installed</label>
         <input type="text" id="f-system" placeholder="Whole-home 3-stage RO system">
       </div>
+    </div>
+    <div class="two-col">
       <div class="field">
         <label>Job / service type</label>
         <input type="text" id="f-job" placeholder="Install, filter change, repair...">
       </div>
-    </div>
-    <div class="two-col">
       <div class="field">
         <label>Current invoice number</label>
         <input type="text" id="f-invoice" placeholder="e.g. 4521 or INV-4521">
         <div class="hint">Type in their existing number, or leave the suggestion.</div>
       </div>
+    </div>
+    <div class="two-col">
       <div class="field">
         <label>Job price</label>
         <input type="text" id="f-price" placeholder="e.g. 450">
+      </div>
+      <div class="field">
+        <label>Payment method</label>
+        <select id="f-payment">
+          <option value="">— Not set —</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="bank_transfer">Bank transfer</option>
+          <option value="cheque">Cheque</option>
+          <option value="other">Other</option>
+        </select>
       </div>
     </div>
     <div class="two-col">
@@ -361,6 +379,16 @@
           <input type="text" id="h-price" placeholder="Price for this visit">
           <input type="text" id="h-job" placeholder="Job type (optional)">
         </div>
+        <div class="field" style="margin-bottom:8px;">
+          <select id="h-payment">
+            <option value="">Payment method — not set</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="bank_transfer">Bank transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
         <textarea id="h-notes" placeholder="What was done at this visit..." style="width:100%;min-height:44px;margin-bottom:8px;"></textarea>
         <button class="btn secondary small" id="addHistoryBtn" type="button">+ Add service record</button>
       </div>
@@ -372,6 +400,29 @@
         <button class="btn secondary" id="cancelBtn">Cancel</button>
         <button class="btn" id="saveBtn">Save</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="scanOverlay">
+  <div class="panel">
+    <h2>Scan invoice</h2>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:0;">Take a photo of the invoice, or choose one from your camera roll. This costs a fraction of a cent to process.</p>
+
+    <div id="scanStep1">
+      <input type="file" id="scanFile" accept="image/*" capture="environment">
+      <div id="scanPreviewWrap" style="display:none;margin-top:12px;">
+        <img id="scanPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border);">
+      </div>
+      <div id="scanError" style="color:var(--red-text);font-size:13px;margin-top:10px;"></div>
+      <div class="panel-actions" style="justify-content:flex-end;">
+        <button class="btn secondary" id="scanCancelBtn">Cancel</button>
+        <button class="btn" id="scanExtractBtn" style="display:none;">Read invoice</button>
+      </div>
+    </div>
+
+    <div id="scanStep2" style="display:none;text-align:center;padding:20px 0;color:var(--ink-soft);font-size:14px;">
+      Reading invoice…
     </div>
   </div>
 </div>
@@ -566,12 +617,25 @@ function statusLabel(s){
   return {lead:'Lead', quote_sent:'Quote sent', scheduled_install:'Scheduled install', active_customer:'Active customer', needs_service:'Needs service'}[s] || s;
 }
 
+function paymentLabel(p){
+  return {cash:'Cash', card:'Card', bank_transfer:'Bank transfer', cheque:'Cheque', other:'Other'}[p] || p;
+}
+
 function addOneYear(dateStr){
   if(!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00');
   if(isNaN(d)) return '';
   d.setFullYear(d.getFullYear() + 1);
   return d.toISOString().slice(0,10);
+}
+
+// The app stores dates internally as YYYY-MM-DD (required by <input type="date">).
+// This converts that to DD-MM-YYYY for display, matching how Pure Pro invoices are written.
+function formatDMY(dateStr){
+  if(!dateStr) return '';
+  const m = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return dateStr;
+  return `${m[3]}-${m[2]}-${m[1]}`;
 }
 
 function daysUntil(dateStr){
@@ -588,7 +652,7 @@ function escapeHtml(str){
 }
 
 function fullAddress(c){
-  return [c.address, c.suburb].filter(Boolean).join(', ');
+  return [c.address, c.suburb, c.postcode].filter(Boolean).join(', ');
 }
 
 function getFiltered(){
@@ -643,7 +707,7 @@ function renderContactsTab(){
           <div class="row-sub">${escapeHtml(fullAddress(c))}${fullAddress(c) && c.phone ? ' · ' : ''}${escapeHtml(c.phone||'')}</div>
         </div>
         <span class="pill ${c.status}">${statusLabel(c.status)}</span>
-        <div class="row-date">Next service: <span class="${dueClass}">${c.nextService || '—'}</span></div>
+        <div class="row-date">Next service: <span class="${dueClass}">${c.nextService ? formatDMY(c.nextService) : '—'}</span></div>
       `;
       list.appendChild(row);
     });
@@ -771,7 +835,7 @@ function renderDueTab(){
           <div class="row-name">${escapeHtml(c.name)}</div>
           <div class="row-sub">${escapeHtml(fullAddress(c))}</div>
         </div>
-        <div class="row-date" style="width:auto;"><span class="${dueClass}">${c.nextService} (${label})</span></div>
+        <div class="row-date" style="width:auto;"><span class="${dueClass}">${formatDMY(c.nextService)} (${label})</span></div>
       </div>
     `;
   }).join('') + `</div>`;
@@ -848,7 +912,7 @@ function renderHistoryList(){
   el.innerHTML = sorted.map(h=>`
     <div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
       <div>
-        <div><strong>${escapeHtml(h.date||'—')}</strong>${h.invoiceNumber ? ' · Invoice #' + escapeHtml(h.invoiceNumber) : ''}${h.price ? ' · $' + escapeHtml(String(h.price)) : ''}${h.job ? ' · ' + escapeHtml(h.job) : ''}</div>
+        <div><strong>${escapeHtml(h.date ? formatDMY(h.date) : '—')}</strong>${h.invoiceNumber ? ' · Invoice #' + escapeHtml(h.invoiceNumber) : ''}${h.price ? ' · $' + escapeHtml(String(h.price)) : ''}${h.job ? ' · ' + escapeHtml(h.job) : ''}${h.payment ? ' · ' + escapeHtml(paymentLabel(h.payment)) : ''}</div>
         ${h.notes ? `<div style="color:var(--ink-soft);margin-top:2px;">${escapeHtml(h.notes)}</div>` : ''}
       </div>
       <button class="btn secondary small" data-hid="${h.id}" type="button" style="flex-shrink:0;">Remove</button>
@@ -880,13 +944,15 @@ document.getElementById('addHistoryBtn').onclick = ()=>{
   const invoiceNumber = document.getElementById('h-invoice').value.trim();
   const price = document.getElementById('h-price').value.trim();
   const job = document.getElementById('h-job').value.trim();
+  const payment = document.getElementById('h-payment').value;
   const notes = document.getElementById('h-notes').value.trim();
-  if(!date && !invoiceNumber && !notes && !price && !job) return;
-  currentHistory.push({ id: uid(), date, invoiceNumber, price, job, notes });
+  if(!date && !invoiceNumber && !notes && !price && !job && !payment) return;
+  currentHistory.push({ id: uid(), date, invoiceNumber, price, job, payment, notes });
   document.getElementById('h-date').value = '';
   document.getElementById('h-invoice').value = '';
   document.getElementById('h-price').value = '';
   document.getElementById('h-job').value = '';
+  document.getElementById('h-payment').value = '';
   document.getElementById('h-notes').value = '';
   renderHistoryList();
   recalcServiceDatesFromHistory();
@@ -897,9 +963,10 @@ function openNew(){
   currentHistory = [];
   document.getElementById('panelTitle').textContent = 'Add contact';
   document.getElementById('deleteBtn').style.display = 'none';
-  ['name','address','suburb','phone','system','job','price','notes'].forEach(f=> document.getElementById('f-'+f).value = '');
+  ['name','address','suburb','postcode','phone','system','job','price','notes'].forEach(f=> document.getElementById('f-'+f).value = '');
   document.getElementById('f-invoice').value = (invoiceCounter + 1);
   document.getElementById('f-status').value = 'lead';
+  document.getElementById('f-payment').value = '';
   document.getElementById('f-lastservice').value = '';
   document.getElementById('f-nextservice').value = '';
   document.getElementById('f-nextservice').dataset.auto = 'true';
@@ -917,11 +984,13 @@ function openEdit(id){
   document.getElementById('f-name').value = c.name || '';
   document.getElementById('f-address').value = c.address || '';
   document.getElementById('f-suburb').value = c.suburb || '';
+  document.getElementById('f-postcode').value = c.postcode || '';
   document.getElementById('f-phone').value = c.phone || '';
   document.getElementById('f-status').value = c.status || 'lead';
   document.getElementById('f-system').value = c.system || '';
   document.getElementById('f-job').value = c.job || '';
   document.getElementById('f-price').value = c.price || '';
+  document.getElementById('f-payment').value = c.payment || '';
   document.getElementById('f-invoice').value = c.invoiceNumber || '';
   document.getElementById('f-lastservice').value = c.lastService || '';
   document.getElementById('f-nextservice').value = c.nextService || '';
@@ -959,11 +1028,13 @@ async function saveContact(){
     name,
     address: document.getElementById('f-address').value.trim(),
     suburb: document.getElementById('f-suburb').value.trim(),
+    postcode: document.getElementById('f-postcode').value.trim(),
     phone: document.getElementById('f-phone').value.trim(),
     status: document.getElementById('f-status').value,
     system: document.getElementById('f-system').value.trim(),
     job: document.getElementById('f-job').value.trim(),
     price: document.getElementById('f-price').value.trim(),
+    payment: document.getElementById('f-payment').value,
     invoiceNumber,
     lastService: document.getElementById('f-lastservice').value,
     nextService: document.getElementById('f-nextservice').value,
@@ -1018,12 +1089,14 @@ const importFieldDefs = [
   {key:'name', label:'Name', required:true, keywords:['name','customer','client']},
   {key:'address', label:'Address', keywords:['address','street']},
   {key:'suburb', label:'Suburb', keywords:['suburb','city','town']},
+  {key:'postcode', label:'Postcode', keywords:['postcode','postalcode','zip']},
   {key:'phone', label:'Phone', keywords:['contactnumber','phone','mobile','number','contact']},
   {key:'system', label:'System installed', keywords:['system']},
   {key:'job', label:'Job / service type', keywords:['job']},
   {key:'lastService', label:'Last service date', keywords:['lastservice','servicedate','last']},
   {key:'invoiceNumber', label:'Invoice #', keywords:['invoice']},
   {key:'price', label:'Price', keywords:['price','amount','cost']},
+  {key:'payment', label:'Payment method', keywords:['payment','paymentmethod','paidby']},
   {key:'notes', label:'Notes', keywords:['notes','note','comment']},
 ];
 let importHeaders = [];
@@ -1158,6 +1231,7 @@ document.getElementById('importConfirmBtn').onclick = async ()=>{
     const invoiceNumber = val('invoiceNumber');
     const price = val('price');
     const job = val('job');
+    const payment = val('payment');
     const notes = val('notes');
 
     const numericInvoice = parseInt(invoiceNumber, 10);
@@ -1166,8 +1240,8 @@ document.getElementById('importConfirmBtn').onclick = async ()=>{
     }
 
     const serviceHistory = [];
-    if(lastService || invoiceNumber || price || notes || job){
-      serviceHistory.push({ id: uid(), date: lastService, invoiceNumber, price, job, notes });
+    if(lastService || invoiceNumber || price || notes || job || payment){
+      serviceHistory.push({ id: uid(), date: lastService, invoiceNumber, price, job, payment, notes });
     }
 
     contacts.push({
@@ -1175,10 +1249,12 @@ document.getElementById('importConfirmBtn').onclick = async ()=>{
       name,
       address: val('address'),
       suburb: val('suburb'),
+      postcode: val('postcode'),
       phone: val('phone'),
       system: val('system'),
       job,
       price,
+      payment,
       invoiceNumber,
       status: defaultStatus,
       lastService,
@@ -1203,6 +1279,129 @@ document.getElementById('importAnotherBtn').onclick = ()=>{
   document.getElementById('importFile').value = '';
   document.getElementById('importError').textContent = '';
 };
+
+// --- Photo-of-invoice scanning ---
+let scanImageBase64 = null;
+let scanImageMediaType = null;
+
+function openScanModal(){
+  document.getElementById('scanFile').value = '';
+  document.getElementById('scanPreviewWrap').style.display = 'none';
+  document.getElementById('scanExtractBtn').style.display = 'none';
+  document.getElementById('scanError').textContent = '';
+  document.getElementById('scanStep1').style.display = 'block';
+  document.getElementById('scanStep2').style.display = 'none';
+  scanImageBase64 = null;
+  document.getElementById('scanOverlay').classList.add('open');
+}
+
+function closeScanModal(){
+  document.getElementById('scanOverlay').classList.remove('open');
+}
+
+document.getElementById('scanBtn').onclick = openScanModal;
+document.getElementById('scanCancelBtn').onclick = closeScanModal;
+document.getElementById('scanOverlay').onclick = (e)=>{ if(e.target.id === 'scanOverlay') closeScanModal(); };
+
+document.getElementById('scanFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  scanImageMediaType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    const dataUrl = evt.target.result;
+    scanImageBase64 = dataUrl.split(',')[1];
+    document.getElementById('scanPreview').src = dataUrl;
+    document.getElementById('scanPreviewWrap').style.display = 'block';
+    document.getElementById('scanExtractBtn').style.display = 'inline-block';
+    document.getElementById('scanError').textContent = '';
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('scanExtractBtn').onclick = async ()=>{
+  if(!scanImageBase64) return;
+  document.getElementById('scanStep1').style.display = 'none';
+  document.getElementById('scanStep2').style.display = 'block';
+
+  try{
+    const res = await authFetch(`${SUPABASE_URL}/functions/v1/scan-invoice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: scanImageBase64, mediaType: scanImageMediaType })
+    });
+    if(!res.ok){
+      const errText = await res.text();
+      throw new Error('The scan function returned an error: ' + errText.slice(0,200));
+    }
+    const extracted = await res.json();
+    if(extracted.error) throw new Error(extracted.error);
+
+    applyExtractedInvoice(extracted);
+    closeScanModal();
+  }catch(err){
+    document.getElementById('scanStep1').style.display = 'block';
+    document.getElementById('scanStep2').style.display = 'none';
+    document.getElementById('scanError').textContent = 'Could not read that invoice: ' + err.message;
+  }
+};
+
+function applyExtractedInvoice(ex){
+  // Convert the AI's DD-MM-YYYY date to the YYYY-MM-DD our date inputs need.
+  let isoDate = '';
+  if(ex.date){
+    const m = String(ex.date).trim().match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    if(m){
+      let y = m[3]; if(y.length===2) y = '20'+y;
+      isoDate = `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    }
+  }
+
+  const nameLower = (ex.name||'').trim().toLowerCase();
+  const existing = nameLower ? contacts.find(c=> c.name.trim().toLowerCase() === nameLower) : null;
+
+  const historyEntry = {
+    id: uid(),
+    date: isoDate,
+    invoiceNumber: ex.invoiceNumber || '',
+    price: ex.price || '',
+    job: ex.job || '',
+    payment: '',
+    notes: ex.notes || ''
+  };
+
+  if(existing){
+    openEdit(existing.id);
+    currentHistory.push(historyEntry);
+    renderHistoryList();
+    recalcServiceDatesFromHistory();
+    if(ex.address) document.getElementById('f-address').value = ex.address;
+    if(ex.suburb) document.getElementById('f-suburb').value = ex.suburb;
+    if(ex.postcode) document.getElementById('f-postcode').value = ex.postcode;
+    if(ex.phone) document.getElementById('f-phone').value = ex.phone;
+    if(ex.system) document.getElementById('f-system').value = ex.system;
+    if(ex.job) document.getElementById('f-job').value = ex.job;
+    if(ex.price) document.getElementById('f-price').value = ex.price;
+    if(ex.invoiceNumber) document.getElementById('f-invoice').value = ex.invoiceNumber;
+    alert('Found an existing contact for "' + existing.name + '" — added this visit to their service history. Review and hit Save to confirm.');
+  } else {
+    openNew();
+    currentHistory.push(historyEntry);
+    renderHistoryList();
+    recalcServiceDatesFromHistory();
+    document.getElementById('f-name').value = ex.name || '';
+    document.getElementById('f-address').value = ex.address || '';
+    document.getElementById('f-suburb').value = ex.suburb || '';
+    document.getElementById('f-postcode').value = ex.postcode || '';
+    document.getElementById('f-phone').value = ex.phone || '';
+    document.getElementById('f-system').value = ex.system || '';
+    document.getElementById('f-job').value = ex.job || '';
+    document.getElementById('f-price').value = ex.price || '';
+    if(ex.invoiceNumber) document.getElementById('f-invoice').value = ex.invoiceNumber;
+    document.getElementById('f-status').value = 'active_customer';
+    alert('No existing contact matched "' + (ex.name || 'this name') + '" — created a new one. Review the details and hit Save to confirm.');
+  }
+}
 
 initAuth();
 </script>
