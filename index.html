@@ -1410,7 +1410,15 @@ function normalizePhone(p){
 }
 
 function normalizeAddress(a){
-  return String(a||'').trim().toLowerCase().replace(/\s+/g,' ');
+  let s = String(a||'').toLowerCase();
+  // Strip ALL punctuation (slashes, commas, hyphens, hashes, etc.) down to spaces —
+  // "Level 3/118 Church St" and "Level 3, 118 Church Street" should normalize the same.
+  s = s.replace(/[^a-z0-9\s]/g, ' ');
+  // Strip common street-type and unit-type words so wording differences don't
+  // cause an otherwise-matching address to be treated as different.
+  s = s.replace(/\b(street|st|road|rd|avenue|ave|drive|dr|court|ct|place|pl|lane|ln|way|parade|pde|crescent|cres|highway|hwy|boulevard|blvd|terrace|tce|close|cl|level|lvl|unit|apt|suite|ste)\b/g, '');
+  s = s.replace(/\s+/g, ' ').trim();
+  return s;
 }
 
 function findMatchingContact(ex){
@@ -1426,7 +1434,10 @@ function findMatchingContact(ex){
   }
   const addrKey = normalizeAddress(ex.address);
   if(addrKey.length >= 4){
-    const byAddress = contacts.find(c=> normalizeAddress(c.address) === addrKey);
+    const byAddress = contacts.find(c=>{
+      const ck = normalizeAddress(c.address);
+      return ck.length >= 4 && (ck === addrKey || ck.includes(addrKey) || addrKey.includes(ck));
+    });
     if(byAddress) return { contact: byAddress, matchedBy: 'address' };
   }
   return null;
